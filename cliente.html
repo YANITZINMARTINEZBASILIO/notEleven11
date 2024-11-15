@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es" class="light dark">
+
+<head>
+
+ <meta charset="UTF-8">
+ <title>Cliente - Chis11:11 </title>
+
+ <script src="js/registraServiceWorker.js"></script>
+
+ <meta name="viewport" content="width=device-width">
+ <meta name="theme-color" content="#fffbfe">
+ <link rel="icon" sizes="48x48" href="favicon.ico">
+ <link rel="manifest" href="site.webmanifest">
+ <script src="ungap/custom-elements.js"></script>
+
+ <script type="module" src="js/configura.js"></script>
+ <link rel="stylesheet" href="css/estilos.css">
+ <link rel="stylesheet" href="css/transicion_pestanas.css"> 
+
+</head>
+
+<body onload="descargaDatos()">
+
+ <md-top-app-bar adicional="tab" headline="headline">
+
+ </md-top-app-bar>
+
+ <h1 id="headline">Lista two-line | Cliente</h1>
+
+ <nav-tab-fixed id="tab"></nav-tab-fixed>
+ <main>
+     <ul class="md-list" id="lista">
+         <li class="md-two-line">
+             <span class="headline">Cargando&hellip;</span>
+             <span class="supporting"><progress max="100">Cargando&hellip;</progress></span>
+         </li>
+     </ul>
+ </main>
+
+   <script type="module">
+    import { exportaAHtml } from "./lib/js/exportaAHtml.js"
+    import { consumeJson } from "./lib/js/consumeJson.js"
+    import { htmlentities } from "./lib/js/htmlentities.js"
+    import { muestraError } from "./lib/js/muestraError.js"
+
+    async function descargaDatos() {
+        try {
+            const respuesta = await consumeJson("srv/lista.php")
+            // Genera el código HTML de la lista.
+            let render = ""
+            for (const modelo of respuesta.body) {
+                const nombre = typeof modelo.nombre === "string" ? htmlentities(modelo.nombre) : ""
+                const chiste = typeof modelo.chiste === "string" ? htmlentities(modelo.chiste) : ""
+                
+                render += /* html */
+                `<li class="md-two-line">
+                    <span class="headline">${nombre}</span>
+                    <span class="supporting">${chiste}</span>
+                </li>`
+            }
+            document.getElementById("lista").innerHTML = render
+        } catch (error) {
+            muestraError(error)
+        }
+    }
+
+    exportaAHtml(descargaDatos)
+</script>
+ 
+  <nav-drw id="nav"></nav-drw>
+  
+ </body>
+
+</html>
+
